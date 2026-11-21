@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ciclo</title>
+  <meta name="description" content="Ciclo — temporizador Pomodoro y organizador de estudio para la universidad.">
+  <meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E0E10" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- PWA / iOS -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ciclo">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Aplica el tema antes de pintar para evitar parpadeos.
+    try {
+      var s = JSON.parse(localStorage.getItem('ciclo:v1') || '{}');
+      var t = (s.settings && s.settings.theme) || 'auto';
+      if (t !== 'auto') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <div class="app" id="app">
+    <nav class="nav" aria-label="Secciones">
+      <div class="nav__brand">
+        <img src="icons/mark.svg" alt="" width="28" height="28">
+        <span>Ciclo</span>
+      </div>
+      <a class="nav__item" href="#/enfoque" data-route="enfoque">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>
+        <span>Enfoque</span>
+      </a>
+      <a class="nav__item" href="#/tareas" data-route="tareas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5l2 2 3.5-4M4 16.5l2 2 3.5-4M13 7h7M13 17h7"/></svg>
+        <span>Tareas</span>
+      </a>
+      <a class="nav__item" href="#/agenda" data-route="agenda">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        <span>Agenda</span>
+      </a>
+      <a class="nav__item" href="#/progreso" data-route="progreso">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        <span>Progreso</span>
+      </a>
+      <a class="nav__item" href="#/mas" data-route="mas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+        <span>Más</span>
+      </a>
+      <div class="nav__mini" id="navMini" hidden></div>
+    </nav>
+
+    <main class="main" id="main" tabindex="-1"></main>
+  </div>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <dialog class="sheet" id="sheet">
+    <form method="dialog" class="sheet__inner" id="sheetInner"></form>
+  </dialog>
+
+  <noscript>Ciclo necesita JavaScript para funcionar.</noscript>
+  <script src="js/ciclo.js" defer></script>
+</body>
+</html>
