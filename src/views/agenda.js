@@ -53,9 +53,9 @@ export function render() {
   return `<section class="view">
     ${viewHeader('Agenda', 'Exámenes, entregas y prácticas', add)}
     ${hero}
-    ${up.length ? `<div class="list">${up.map(eventRow).join('')}</div>`
+    ${up.length ? `<div class="list list--cols">${up.map(eventRow).join('')}</div>`
       : emptyState('calendar', 'Sin fechas próximas', 'Añade tus exámenes y entregas para ver la cuenta atrás y cuántas horas llevas estudiadas de cada asignatura.')}
-    ${past.length ? `<h2 class="section-title">Pasados</h2><div class="list">${past.slice(0, 20).map(eventRow).join('')}</div>` : ''}
+    ${past.length ? `<h2 class="section-title">Pasados</h2><div class="list list--cols">${past.slice(0, 20).map(eventRow).join('')}</div>` : ''}
   </section>`;
 }
 

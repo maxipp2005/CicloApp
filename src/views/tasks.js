@@ -38,7 +38,7 @@ export function render() {
       <div class="seg" role="tablist">${Object.entries(FILTERS).map(([k, l]) => `<button data-act="filter" data-f="${k}" class="${state.ui.tasksFilter === k ? 'is-on' : ''}">${l}</button>`).join('')}</div>
       ${state.subjects.length ? `<select class="select" style="width:auto;height:38px;font-size:14px" data-change="subject-filter" aria-label="Filtrar por asignatura">${subjectOptions(sf, { none: 'Todas las asignaturas' })}</select>` : ''}
     </div>
-    ${list.length ? `<div class="list">${list.map((t) => `
+    ${list.length ? `<div class="list list--cols">${list.map((t) => `
       <div class="item ${t.completed ? 'is-done' : ''} ${t.id === cur && !t.completed ? 'is-current' : ''}" data-id="${t.id}">
         <button class="check ${t.completed ? 'is-on' : ''}" data-act="check" aria-label="${t.completed ? 'Marcar como pendiente' : 'Completar'}">${icon('check')}</button>
         <button class="item__main" data-act="edit" style="text-align:left">

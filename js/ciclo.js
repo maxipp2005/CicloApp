@@ -1172,7 +1172,7 @@ function render() {
       <div class="seg" role="tablist">${Object.entries(FILTERS).map(([k, l]) => `<button data-act="filter" data-f="${k}" class="${state.ui.tasksFilter === k ? 'is-on' : ''}">${l}</button>`).join('')}</div>
       ${state.subjects.length ? `<select class="select" style="width:auto;height:38px;font-size:14px" data-change="subject-filter" aria-label="Filtrar por asignatura">${subjectOptions(sf, { none: 'Todas las asignaturas' })}</select>` : ''}
     </div>
-    ${list.length ? `<div class="list">${list.map((t) => `
+    ${list.length ? `<div class="list list--cols">${list.map((t) => `
       <div class="item ${t.completed ? 'is-done' : ''} ${t.id === cur && !t.completed ? 'is-current' : ''}" data-id="${t.id}">
         <button class="check ${t.completed ? 'is-on' : ''}" data-act="check" aria-label="${t.completed ? 'Marcar como pendiente' : 'Completar'}">${icon('check')}</button>
         <button class="item__main" data-act="edit" style="text-align:left">
@@ -1311,9 +1311,9 @@ function render() {
   return `<section class="view">
     ${viewHeader('Agenda', 'Exámenes, entregas y prácticas', add)}
     ${hero}
-    ${up.length ? `<div class="list">${up.map(eventRow).join('')}</div>`
+    ${up.length ? `<div class="list list--cols">${up.map(eventRow).join('')}</div>`
       : emptyState('calendar', 'Sin fechas próximas', 'Añade tus exámenes y entregas para ver la cuenta atrás y cuántas horas llevas estudiadas de cada asignatura.')}
-    ${past.length ? `<h2 class="section-title">Pasados</h2><div class="list">${past.slice(0, 20).map(eventRow).join('')}</div>` : ''}
+    ${past.length ? `<h2 class="section-title">Pasados</h2><div class="list list--cols">${past.slice(0, 20).map(eventRow).join('')}</div>` : ''}
   </section>`;
 }
 
@@ -1372,8 +1372,6 @@ __m["views/stats.js"] = (() => {
 const { esc, icon, dayKey, addDays, startOfDay, weekdayLetter, fmtMinutes, fmtHours, fmtTime, fmtDate, uid, monthShort } = __m["utils.js"];
 const { state, update, minutesByDay, sessionsOn, streak, bestStreak, subjectById, taskById } = __m["store.js"];
 const { sheet, confirmSheet, subjectOptions, viewHeader, emptyState } = __m["ui.js"];
-const WEEKS = 26;
-
 function render() {
   const byDay = minutesByDay();
   const todayKey = dayKey();
@@ -1388,7 +1386,8 @@ function render() {
   const weekMin = vals.reduce((a, b) => a + b, 0);
   const max = Math.max(60, ...vals);
 
-  // Mapa de calor: columnas = semanas (lunes a domingo)
+  // Mapa de calor: columnas = semanas (lunes a domingo). Un año entero en pantallas anchas.
+  const WEEKS = matchMedia('(min-width: 1000px)').matches ? 52 : 26;
   const today = startOfDay();
   const offset = (today.getDay() + 6) % 7; // 0 = lunes
   const first = addDays(today, -offset - (WEEKS - 1) * 7);
@@ -1425,22 +1424,25 @@ function render() {
       <div class="stat"><div class="stat__k">7 días</div><div class="stat__v">${fmtHours(weekMin)}<small>h</small></div></div>
     </div>
 
-    <div class="card mt">
+    <div class="duo mt">
+    <div class="card">
       <div class="spread"><b>Últimos 7 días</b><span class="small muted">Media ${fmtMinutes(weekMin / 7)}/día</span></div>
       <div class="bars">${days.map((d, i) => `<div class="bars__col"><div class="bars__track"><div class="bars__bar ${i === 6 ? 'is-today' : ''}" style="height:${(vals[i] / max) * 100}%">${vals[i] ? `<span>${vals[i] >= 60 ? fmtHours(vals[i]) + 'h' : vals[i] + "'"}</span>` : ''}</div></div><div class="bars__lbl">${weekdayLetter(d)}</div></div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="spread" style="margin-bottom:14px"><b>Por asignatura</b><span class="small muted">Últimos 30 días</span></div>
+      ${share ? `<div class="share">${share}</div>` : '<p class="muted small">Aún no hay sesiones en los últimos 30 días.</p>'}
+    </div>
     </div>
 
     <div class="card mt">
       <div class="spread" style="margin-bottom:14px"><b>Constancia</b><span class="small muted">Mejor racha: ${bestStreak()} días</span></div>
-      <div class="heat" aria-label="Mapa de actividad de los últimos 6 meses">${cells.join('')}</div>
+      <div class="heat" aria-label="Mapa de actividad">${cells.join('')}</div>
       <div class="heat-legend"><span>${monthShort(first)}</span><span style="flex:1"></span>Menos <i style="background:var(--surface-2)"></i><i style="background:color-mix(in srgb,var(--focus) 25%,var(--surface-2))"></i><i style="background:color-mix(in srgb,var(--focus) 50%,var(--surface-2))"></i><i style="background:color-mix(in srgb,var(--focus) 75%,var(--surface-2))"></i><i style="background:var(--focus)"></i> Más</div>
     </div>
 
-    <h2 class="section-title">Por asignatura · 30 días</h2>
-    <div class="card">${share ? `<div class="share">${share}</div>` : '<p class="muted small">Aún no hay sesiones en los últimos 30 días.</p>'}</div>
-
     <h2 class="section-title">Sesiones de hoy</h2>
-    ${todaySessions.length ? `<div class="list">${todaySessions.slice().reverse().map((s) => {
+    ${todaySessions.length ? `<div class="list list--cols">${todaySessions.slice().reverse().map((s) => {
       const subj = subjectById(s.subjectId); const t = taskById(s.taskId);
       return `<div class="item" data-id="${s.id}">
         <span class="picker__dot" style="background:${subj?.color || 'var(--line-strong)'}"></span>
@@ -1501,7 +1503,7 @@ const { requestNotifications, notifPermission, notifSupported, ntfyTest, randomT
 const { chime, unlockAudio, setAmbientVolume } = __m["sound.js"];
 const { go } = __m["router.js"];
 const { newSubjectSheet } = __m["views/focus.js"];
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.1.0';
 const back = (to = '') => `<a class="back" href="#/mas${to ? '/' + to : ''}">${icon('chevL')} Más</a>`;
 
 // =====================================================================
@@ -1539,7 +1541,7 @@ function subjects() {
   for (const s of state.sessions) if (s.subjectId) mins.set(s.subjectId, (mins.get(s.subjectId) || 0) + s.min);
   const existing = new Set(state.subjects.map((s) => s.name.toLowerCase()));
   const sugg = SUGGESTED.filter((n) => !existing.has(n.toLowerCase()));
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Asignaturas', 'Asocia tus sesiones para saber a qué dedicas el tiempo', `<button class="btn btn--primary btn--sm" data-act="subj-add">${icon('plus')} Nueva</button>`)}
     ${state.subjects.length ? `<div class="list">${state.subjects.map((s) => `
@@ -1643,7 +1645,7 @@ function baseResults() {
 }
 
 function bases() {
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Conversor de bases', 'Binario, octal, decimal, hexadecimal y complemento a 2')}
     <div class="card form-stack">
@@ -1686,7 +1688,7 @@ function gradeCalc() {
 
 function grades() {
   const g = state.grades;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Calificaciones', 'Calcula qué nota necesitas para aprobar')}
     <div class="card form-stack">
@@ -1717,7 +1719,7 @@ function settingsView() {
   const perm = notifPermission();
   const permText = { granted: 'Activadas', denied: 'Bloqueadas en el sistema', default: 'Sin activar', unsupported: isIOS() && !isStandalone() ? 'Instala la app primero' : 'No disponibles' }[perm];
   const row = (title, sub, end) => `<div class="row"><div class="row__main"><div class="row__title">${title}</div>${sub ? `<div class="row__sub">${sub}</div>` : ''}</div><div class="row__end">${end}</div></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Ajustes')}
 
@@ -1779,7 +1781,7 @@ addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPro
 
 function install() {
   const step = (n, t) => `<div class="row"><span class="row__icon" style="background:var(--surface-2);color:var(--text);font-weight:700">${n}</span><div class="row__main">${t}</div></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Instalar Ciclo', isStandalone() ? 'Ya estás usando la app instalada ✓' : 'Úsala como una app nativa, sin conexión')}
     ${deferredPrompt ? `<button class="btn btn--accent btn--block" data-act="install" style="margin-bottom:18px">${icon('download')} Instalar en este dispositivo</button>` : ''}
@@ -1804,7 +1806,7 @@ function install() {
 
 function shortcuts() {
   const k = (keys, d) => `<div><span>${d}</span><span>${keys.map((x) => `<span class="kbd">${x}</span>`).join(' ')}</span></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Atajos de teclado', 'En PC, Mac o iPad con teclado')}
     <div class="card kbd-list">
@@ -1820,7 +1822,7 @@ function shortcuts() {
 }
 
 function about() {
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     <div class="center" style="padding:20px 0 8px">
       <img src="icons/icon.svg" width="96" height="96" alt="" style="margin:0 auto 16px;border-radius:22px;box-shadow:var(--shadow)">

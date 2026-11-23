@@ -3,7 +3,6 @@ import { esc, icon, dayKey, addDays, startOfDay, weekdayLetter, fmtMinutes, fmtH
 import { state, update, minutesByDay, sessionsOn, streak, bestStreak, subjectById, taskById } from '../store.js';
 import { sheet, confirmSheet, subjectOptions, viewHeader, emptyState } from '../ui.js';
 
-const WEEKS = 26;
 
 export function render() {
   const byDay = minutesByDay();
@@ -19,7 +18,8 @@ export function render() {
   const weekMin = vals.reduce((a, b) => a + b, 0);
   const max = Math.max(60, ...vals);
 
-  // Mapa de calor: columnas = semanas (lunes a domingo)
+  // Mapa de calor: columnas = semanas (lunes a domingo). Un año entero en pantallas anchas.
+  const WEEKS = matchMedia('(min-width: 1000px)').matches ? 52 : 26;
   const today = startOfDay();
   const offset = (today.getDay() + 6) % 7; // 0 = lunes
   const first = addDays(today, -offset - (WEEKS - 1) * 7);
@@ -56,22 +56,25 @@ export function render() {
       <div class="stat"><div class="stat__k">7 días</div><div class="stat__v">${fmtHours(weekMin)}<small>h</small></div></div>
     </div>
 
-    <div class="card mt">
+    <div class="duo mt">
+    <div class="card">
       <div class="spread"><b>Últimos 7 días</b><span class="small muted">Media ${fmtMinutes(weekMin / 7)}/día</span></div>
       <div class="bars">${days.map((d, i) => `<div class="bars__col"><div class="bars__track"><div class="bars__bar ${i === 6 ? 'is-today' : ''}" style="height:${(vals[i] / max) * 100}%">${vals[i] ? `<span>${vals[i] >= 60 ? fmtHours(vals[i]) + 'h' : vals[i] + "'"}</span>` : ''}</div></div><div class="bars__lbl">${weekdayLetter(d)}</div></div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="spread" style="margin-bottom:14px"><b>Por asignatura</b><span class="small muted">Últimos 30 días</span></div>
+      ${share ? `<div class="share">${share}</div>` : '<p class="muted small">Aún no hay sesiones en los últimos 30 días.</p>'}
+    </div>
     </div>
 
     <div class="card mt">
       <div class="spread" style="margin-bottom:14px"><b>Constancia</b><span class="small muted">Mejor racha: ${bestStreak()} días</span></div>
-      <div class="heat" aria-label="Mapa de actividad de los últimos 6 meses">${cells.join('')}</div>
+      <div class="heat" aria-label="Mapa de actividad">${cells.join('')}</div>
       <div class="heat-legend"><span>${monthShort(first)}</span><span style="flex:1"></span>Menos <i style="background:var(--surface-2)"></i><i style="background:color-mix(in srgb,var(--focus) 25%,var(--surface-2))"></i><i style="background:color-mix(in srgb,var(--focus) 50%,var(--surface-2))"></i><i style="background:color-mix(in srgb,var(--focus) 75%,var(--surface-2))"></i><i style="background:var(--focus)"></i> Más</div>
     </div>
 
-    <h2 class="section-title">Por asignatura · 30 días</h2>
-    <div class="card">${share ? `<div class="share">${share}</div>` : '<p class="muted small">Aún no hay sesiones en los últimos 30 días.</p>'}</div>
-
     <h2 class="section-title">Sesiones de hoy</h2>
-    ${todaySessions.length ? `<div class="list">${todaySessions.slice().reverse().map((s) => {
+    ${todaySessions.length ? `<div class="list list--cols">${todaySessions.slice().reverse().map((s) => {
       const subj = subjectById(s.subjectId); const t = taskById(s.taskId);
       return `<div class="item" data-id="${s.id}">
         <span class="picker__dot" style="background:${subj?.color || 'var(--line-strong)'}"></span>

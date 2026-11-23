@@ -7,7 +7,7 @@ import { chime, unlockAudio, setAmbientVolume } from '../sound.js';
 import { go } from '../router.js';
 import { newSubjectSheet } from './focus.js';
 
-export const APP_VERSION = '1.0.1';
+export const APP_VERSION = '1.1.0';
 const back = (to = '') => `<a class="back" href="#/mas${to ? '/' + to : ''}">${icon('chevL')} Más</a>`;
 
 // =====================================================================
@@ -45,7 +45,7 @@ function subjects() {
   for (const s of state.sessions) if (s.subjectId) mins.set(s.subjectId, (mins.get(s.subjectId) || 0) + s.min);
   const existing = new Set(state.subjects.map((s) => s.name.toLowerCase()));
   const sugg = SUGGESTED.filter((n) => !existing.has(n.toLowerCase()));
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Asignaturas', 'Asocia tus sesiones para saber a qué dedicas el tiempo', `<button class="btn btn--primary btn--sm" data-act="subj-add">${icon('plus')} Nueva</button>`)}
     ${state.subjects.length ? `<div class="list">${state.subjects.map((s) => `
@@ -149,7 +149,7 @@ function baseResults() {
 }
 
 function bases() {
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Conversor de bases', 'Binario, octal, decimal, hexadecimal y complemento a 2')}
     <div class="card form-stack">
@@ -192,7 +192,7 @@ function gradeCalc() {
 
 function grades() {
   const g = state.grades;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Calificaciones', 'Calcula qué nota necesitas para aprobar')}
     <div class="card form-stack">
@@ -223,7 +223,7 @@ function settingsView() {
   const perm = notifPermission();
   const permText = { granted: 'Activadas', denied: 'Bloqueadas en el sistema', default: 'Sin activar', unsupported: isIOS() && !isStandalone() ? 'Instala la app primero' : 'No disponibles' }[perm];
   const row = (title, sub, end) => `<div class="row"><div class="row__main"><div class="row__title">${title}</div>${sub ? `<div class="row__sub">${sub}</div>` : ''}</div><div class="row__end">${end}</div></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Ajustes')}
 
@@ -285,7 +285,7 @@ addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPro
 
 function install() {
   const step = (n, t) => `<div class="row"><span class="row__icon" style="background:var(--surface-2);color:var(--text);font-weight:700">${n}</span><div class="row__main">${t}</div></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Instalar Ciclo', isStandalone() ? 'Ya estás usando la app instalada ✓' : 'Úsala como una app nativa, sin conexión')}
     ${deferredPrompt ? `<button class="btn btn--accent btn--block" data-act="install" style="margin-bottom:18px">${icon('download')} Instalar en este dispositivo</button>` : ''}
@@ -310,7 +310,7 @@ function install() {
 
 function shortcuts() {
   const k = (keys, d) => `<div><span>${d}</span><span>${keys.map((x) => `<span class="kbd">${x}</span>`).join(' ')}</span></div>`;
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     ${viewHeader('Atajos de teclado', 'En PC, Mac o iPad con teclado')}
     <div class="card kbd-list">
@@ -326,7 +326,7 @@ function shortcuts() {
 }
 
 function about() {
-  return `<section class="view">
+  return `<section class="view view--narrow">
     ${back()}
     <div class="center" style="padding:20px 0 8px">
       <img src="icons/icon.svg" width="96" height="96" alt="" style="margin:0 auto 16px;border-radius:22px;box-shadow:var(--shadow)">

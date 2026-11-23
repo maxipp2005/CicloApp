@@ -1,6 +1,6 @@
 // Service Worker de Ciclo: funcionamiento sin conexión y gestión de notificaciones.
 // Sube VERSION cada vez que publiques cambios para que los dispositivos se actualicen.
-const VERSION = 'ciclo-v1.0.1';
+const VERSION = 'ciclo-v1.1.0';
 
 const ASSETS = [
   './',
